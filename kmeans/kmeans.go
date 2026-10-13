@@ -89,14 +89,14 @@ func convert(data cluster.Interface) ([]value, int, error) {
 }
 
 // Seed generates the initial means for the k-means algorithm according to the k-means++
-// algorithm
-func (km *Kmeans) Seed(k int) {
+// algorithm, drawing from rnd.
+func (km *Kmeans) Seed(k int, rnd *rand.Rand) {
 	km.means = make([]center, k)
 	for i := range km.means {
 		km.means[i].point = make(point, km.dims)
 	}
 
-	copy(km.means[0].point, km.values[rand.Intn(len(km.values))].point)
+	copy(km.means[0].point, km.values[rnd.Intn(len(km.values))].point)
 	if k == 1 {
 		return
 	}
@@ -108,7 +108,7 @@ func (km *Kmeans) Seed(k int) {
 			d[j] = min
 			sum += d[j]
 		}
-		target := rand.Float64() * sum
+		target := rnd.Float64() * sum
 		j := 0
 		for sum = d[0]; sum < target; sum += d[j] {
 			j++
